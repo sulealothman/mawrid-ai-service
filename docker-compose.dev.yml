@@ -1,0 +1,83 @@
+services:
+  api:
+    build: .
+    container_name: mawrid-dev-ai-api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8080
+    env_file:
+      - .env.development
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      db-ai:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    networks:
+      - mawrid_dev_net
+
+  worker:
+    build: .
+    container_name: mawrid-dev-ai-worker
+    command: python -u -m app.workers.ingest_worker
+    env_file:
+      - .env.development
+    volumes:
+      - .:/app
+    depends_on:
+      db-ai:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    restart: always
+    networks:
+      - mawrid_dev_net
+
+  db-ai:
+    image: postgres:16
+    container_name: mawrid-dev-ai-db
+    env_file:
+      - .env.development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aiddb"]
+      interval: 7s
+      timeout: 7s
+      retries: 3
+    networks:
+      - mawrid_dev_net
+
+  alembic:
+    build: .
+    container_name: mawrid-dev-ai-alembic
+    working_dir: /app
+
+    command: alembic upgrade head
+    env_file:
+      - .env.development
+    depends_on:
+      db-ai:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - mawrid_dev_net
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: mawrid-dev-ai-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - mawrid_dev_net
+
+volumes:
+  postgres_data:
+  qdrant_data:
+
+networks:
+  mawrid_dev_net:
+    external: true
