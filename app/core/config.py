@@ -17,6 +17,16 @@ class Settings(BaseSettings):
     AI_EMBED_MODEL: str
     EMBEDDING_DIM: int = Field(..., description="Embedding vector dimension")
 
+    # ─────────── Chat Config ───────────
+    CHAT_DEFAULT_TEMPERATURE: float = 0.2
+    CHAT_DEFAULT_MAX_TOKENS: int = 4096
+    CHAT_DEFAULT_TOP_K: int = 5
+
+    # ─────────── Chunking Config ───────────
+    CHUNK_MAX_TOKENS: int = 4096
+    CHUNK_OVERLAP_TOKENS: int = 512
+    CHUNK_ENCODING: str = "cl100k_base"
+
     # ─────────── Database ───────────
     DATABASE_URL: str
     DATABASE_URL_SYNC: str

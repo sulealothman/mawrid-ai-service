@@ -1,9 +1,9 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
+import tiktoken
 from typing import Any
 
-import tiktoken
+from app.core.config import settings
 
 
 @dataclass
@@ -14,9 +14,9 @@ class ChunkItem:
 def chunk_text(
     text: str,
     *,
-    max_tokens: int = 800,
-    overlap_tokens: int = 100,
-    encoding_name: str = "cl100k_base",
+    max_tokens: int = settings.CHUNK_MAX_TOKENS,
+    overlap_tokens: int = settings.CHUNK_OVERLAP_TOKENS,
+    encoding_name: str = settings.CHUNK_ENCODING,
 ) -> list[dict[str, Any]]:
     """
     Split text into token-bounded chunks with token overlap.
@@ -34,7 +34,7 @@ def chunk_text(
         return []
 
     if max_tokens <= 0:
-        max_tokens = 800
+        max_tokens = 4096
     if overlap_tokens < 0:
         overlap_tokens = 0
     if overlap_tokens >= max_tokens:
@@ -56,7 +56,6 @@ def chunk_text(
         if end >= n:
             break
 
-        # move window with overlap
         start = max(0, end - overlap_tokens)
 
     return chunks

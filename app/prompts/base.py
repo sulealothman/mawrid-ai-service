@@ -19,7 +19,7 @@ class PromptBuilder:
         ]
 
         for m in history[:10]:
-            if m.get("role") in ("user"):
+            if m.get("role") == "user":
                 messages.append({
                     "role": m["role"],
                     "content": m["content"],

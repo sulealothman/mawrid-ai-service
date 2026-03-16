@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from fastapi import APIRouter, Depends
 
 from app.api.deps.auth import verify_internal_api_key
@@ -23,9 +22,6 @@ async def chat(
         kb_id=str(req.kb_id),
         question=req.query,
         history=[m.model_dump() for m in req.messages],
-        top_k=req.retrieval.top_k,
-        temperature=req.generation.temperature,
-        max_tokens=req.generation.max_tokens,
     )
 
     return ChatResponse(

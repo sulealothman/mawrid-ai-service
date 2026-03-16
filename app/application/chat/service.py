@@ -6,18 +6,16 @@ from app.providers.ai_provider import AIProvider
 from app.providers.schemas import ChatResult
 from app.domain.prompts.message_builder import build_rag_messages
 from app.domain.retrieval.retriever import retrieve_context
-
-DEFAULT_MAX_TOKENS = 800
-DEFAULT_TEMPERATURE = 0.2
+from app.core.config import settings
 
 async def ask_question(
     ai: AIProvider,
     kb_id: str,
     question: str,
     history: List[Dict[str, str]] | None = None,
-    top_k: int = 5,
-    temperature: float = DEFAULT_TEMPERATURE,
-    max_tokens: int = DEFAULT_MAX_TOKENS,
+    top_k: int = settings.CHAT_DEFAULT_TOP_K,
+    temperature: float = settings.CHAT_DEFAULT_TEMPERATURE,
+    max_tokens: int = settings.CHAT_DEFAULT_MAX_TOKENS,
 ) -> Tuple[str, List[dict]]:
 
     contexts, sources = await retrieve_context(ai, kb_id, question, top_k)
@@ -34,7 +32,7 @@ async def ask_question(
         max_tokens=max_tokens,
     )
 
-    return result.text, sources
+    return result.text or "AI response is empty.", sources
 
 
 async def stream_answer(
