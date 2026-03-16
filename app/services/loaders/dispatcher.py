@@ -34,7 +34,7 @@ def load_pages_by_ext(file_path: str, ext: str) -> Iterable[Page]:
     if ext in {"yml", "yaml"}:
         return load_yaml(file_path)
     
-    if ext in "csv":
+    if ext == "csv":
         return load_csv(file_path)
 
     raise ValueError(f"Unsupported file type: {ext}")

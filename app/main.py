@@ -1,9 +1,7 @@
 from fastapi import FastAPI
-from app.api.routes.chat import router as chat_router
-from app.api.routes.title_generate import router as title_router
 from app.core.config import settings
 from app.vector import ensure_collection
-
+from app.api.router import api_router
 
 app = FastAPI(title=settings.APP_TITLE)
 
@@ -11,8 +9,7 @@ app = FastAPI(title=settings.APP_TITLE)
 async def startup():
     await ensure_collection()
 
-app.include_router(chat_router)
-app.include_router(title_router)
+app.include_router(api_router)
 
 
 

@@ -1,58 +1,25 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Header, HTTPException
-from pydantic import BaseModel, Field
-from typing import List, Optional
-from uuid import UUID
+from fastapi import APIRouter, Depends
 
-from app.providers.ai_factory import get_ai_provider
+from app.api.deps.auth import verify_internal_api_key
+from app.api.deps.providers import get_ai_provider_dep
 from app.services.rag import ask_question
-from app.core.config import settings
+from app.api.schemas.chat import ChatRequest, ChatResponse
+
+router = APIRouter(
+    prefix="/v1",
+    dependencies=[Depends(verify_internal_api_key)],
+)
 
 
-router = APIRouter(prefix="/v1")
-
-
-class Message(BaseModel):
-    role: str
-    content: str
-
-
-class RetrievalConfig(BaseModel):
-    top_k: int = 5
-
-
-class GenerationConfig(BaseModel):
-    temperature: float = 0.2
-    max_tokens: int = 800
-
-
-class ChatRequest(BaseModel):
-    request_id: str
-    kb_id: UUID
-    query: str
-    messages: List[Message] = Field(default_factory=list)
-    retrieval: RetrievalConfig = Field(default_factory=RetrievalConfig)
-    generation: GenerationConfig = Field(default_factory=GenerationConfig)
-
-
-class ChatResponse(BaseModel):
-    request_id: str
-    answer: str
-    sources: List[dict]
-    usage: Optional[dict] = None
 
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(
     req: ChatRequest,
-    x_internal_key: str = Header(...)
+    ai = Depends(get_ai_provider_dep)
 ):
-
-    if x_internal_key != settings.INTERNAL_API_KEY:
-        raise HTTPException(status_code=403, detail="Forbidden")
-
-    ai = get_ai_provider()
 
     answer, sources = await ask_question(
         ai=ai,
