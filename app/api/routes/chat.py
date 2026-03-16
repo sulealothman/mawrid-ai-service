@@ -4,16 +4,13 @@ from fastapi import APIRouter, Depends
 
 from app.api.deps.auth import verify_internal_api_key
 from app.api.deps.providers import get_ai_provider_dep
-from app.services.rag import ask_question
+from app.application.chat.service import ask_question
 from app.api.schemas.chat import ChatRequest, ChatResponse
 
 router = APIRouter(
     prefix="/v1",
     dependencies=[Depends(verify_internal_api_key)],
 )
-
-
-
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(
