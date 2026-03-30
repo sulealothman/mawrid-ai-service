@@ -13,9 +13,14 @@ class Settings(BaseSettings):
     AI_API_KEY: str
     AI_BASE_URL: str
 
+    # ─────────── AI Models ───────────
     AI_CHAT_MODEL: str
     AI_EMBED_MODEL: str
     EMBEDDING_DIM: int = Field(..., description="Embedding vector dimension")
+
+    # ─────────── AI WebSocket Auth ───────────
+    AI_WS_TOKEN_SECRET: str
+    AI_WS_TOKEN_TTL: int = 120
 
     # ─────────── Chat Config ───────────
     CHAT_DEFAULT_TEMPERATURE: float = 0.2
@@ -40,9 +45,9 @@ class Settings(BaseSettings):
 
     # ─────────── Internal API ───────────
     INTERNAL_API_KEY: str = "default_internal_key"
+    LARAVEL_API_BASE_URL: str
 
-    LARAVEL_WEBHOOK_URL: str
-
+    # ─────────── Redis ───────────
     REDIS_URL: str
 
     # ─────────── AI Job Config ───────────

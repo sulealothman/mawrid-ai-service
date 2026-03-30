@@ -1,20 +1,18 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from __future__ import annotations
+
+from pydantic import BaseModel
+from typing import Literal, Optional
 from uuid import UUID
 
-class Message(BaseModel):
-    role: str
-    content: str
-
-class ChatRequest(BaseModel):
+class WSMessageSendPayload(BaseModel):
+    type: Literal["message.send"]
     request_id: str
+    chat_id: UUID
     kb_id: UUID
-    query: str
-    messages: List[Message] = Field(default_factory=list)
+    message: str
+    parent_id: Optional[int] = None
 
 
-class ChatResponse(BaseModel):
+class WSCancelPayload(BaseModel):
+    type: Literal["generation.cancel"]
     request_id: str
-    answer: str
-    sources: List[dict]
-    usage: Optional[dict] = None

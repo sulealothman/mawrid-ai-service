@@ -8,6 +8,7 @@ from typing import Any, Dict
 import requests
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.clients.laravel import laravel_client, laravel_routes
 
 from app.core.config import settings
 
@@ -34,18 +35,8 @@ MAX_ATTEMPTS = settings.AI_JOB_MAX_ATTEMPTS
 RECLAIM_EVERY_SEC = settings.AI_RECLAIM_EVERY_SEC
 MIN_IDLE_MS = settings.AI_RECLAIM_MIN_IDLE_MS
 
-LARAVEL_WEBHOOK_URL = settings.LARAVEL_WEBHOOK_URL
-
-
-def send_webhook(payload: dict):
-    requests.post(
-        LARAVEL_WEBHOOK_URL,
-        json=payload,
-        headers={
-            "X-Internal-Key": settings.INTERNAL_API_KEY,
-        },
-        timeout=10,
-    )
+async def send_webhook(payload: dict):
+    await laravel_client.post(laravel_routes.FILE_OPERATIONS_WEBHOOK, json=payload)
 
 @dataclass(frozen=True)
 class IngestJob:
@@ -190,7 +181,7 @@ async def _handle_message(
 
     if job.attempt == 1:
         try:
-            send_webhook({
+            await send_webhook({
                 "operation_id": job.job_id,
                 "status": "processing"
             })
@@ -203,7 +194,7 @@ async def _handle_message(
             await _run_one(job, db=db, ai=ai, s3=s3)
 
         try:
-            send_webhook({
+            await send_webhook({
                 "operation_id": job.job_id,
                 "status": "processed"
             })
@@ -228,7 +219,7 @@ async def _handle_message(
                 maxlen=10000,
             )
             try:
-                send_webhook({
+                await send_webhook({
                     "operation_id": job.job_id,
                     "status": "failed"
                 })
