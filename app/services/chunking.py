@@ -1,15 +1,8 @@
 from __future__ import annotations
-from dataclasses import dataclass
 import tiktoken
 from typing import Any
 
 from app.core.config import settings
-
-
-@dataclass
-class ChunkItem:
-    text: str
-
 
 def chunk_text(
     text: str,

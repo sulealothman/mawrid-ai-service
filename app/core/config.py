@@ -1,8 +1,14 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env.development",
+        case_sensitive=True,
+        extra="ignore",
+    )
+
     # ─────────── App ───────────
     APP_URL: str = "http://localhost"
     APP_TITLE: str = "Mawrid AI Service"
@@ -36,12 +42,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     DATABASE_URL_SYNC: str
 
-
     # ─────────── Qdrant ───────────
     QDRANT_URL: str
     QDRANT_COLLECTION: str = "chunks"
     VECTOR_DISTANCE: str = "cosine"  # cosine | dot | euclid
-
 
     # ─────────── Internal API ───────────
     INTERNAL_API_KEY: str = "default_internal_key"
@@ -60,16 +64,11 @@ class Settings(BaseSettings):
     AI_RECLAIM_EVERY_SEC: int = 20
     AI_RECLAIM_MIN_IDLE_MS: int = 120000
 
-
     # ─────────── S3 ───────────
     AWS_ACCESS_KEY_ID: str
     AWS_SECRET_ACCESS_KEY: str
     AWS_DEFAULT_REGION: str
     AWS_ENDPOINT_URL: str
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
 
 
 settings = Settings()
