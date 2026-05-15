@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     AI_CHAT_MODEL: str
     AI_EMBED_MODEL: str
     EMBEDDING_DIM: int = Field(..., description="Embedding vector dimension")
+    FLATTEN_MAX_VALUE_LENGTH: int = 5000
 
     # ─────────── AI WebSocket Auth ───────────
     AI_WS_TOKEN_SECRET: str

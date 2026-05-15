@@ -1,8 +1,6 @@
 from __future__ import annotations
 from typing import Any
-
-MAX_VALUE_LENGTH = 5000
-
+from app.core.config import settings
 
 def flatten_any(
     obj: Any,
@@ -11,6 +9,7 @@ def flatten_any(
     max_depth: int = 25,
     max_items: int = 5000,
     max_list_items: int = 200,
+    max_value_length: int = settings.FLATTEN_MAX_VALUE_LENGTH,
 ) -> list[tuple[str, str]]:
 
     out: list[tuple[str, str]] = []
@@ -22,8 +21,8 @@ def flatten_any(
         if count >= max_items:
             return
 
-        if len(v) > MAX_VALUE_LENGTH:
-            v = v[:MAX_VALUE_LENGTH] + f"...[truncated len={len(v)}]"
+        if len(v) > max_value_length:
+            v = v[:max_value_length] + f"...[truncated len={len(v)}]"
 
         out.append((k, v))
         count += 1
